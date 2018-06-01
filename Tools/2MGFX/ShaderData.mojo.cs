@@ -7,7 +7,7 @@ namespace TwoMGFX
 {
 	internal partial class ShaderData
 	{
-        public static ShaderData CreateGLSL(byte[] byteCode, bool isVertexShader, List<ConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates, bool debug, Dictionary<string, string> precisionDict)
+        public static ShaderData CreateGLSL(byte[] byteCode, bool isVertexShader, List<ConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates, bool debug)
 		{
 			var dxshader = new ShaderData ();
 			dxshader.SharedIndex = sharedIndex;
@@ -88,10 +88,7 @@ namespace TwoMGFX
 			// incorrect from MojoShader.
 			{
 				uint bool_index = 0;
-                uint float4_index = 0;
-                uint lowp_float4_index = 0;
-                uint mediump_float4_index = 0;
-                uint highp_float4_index = 0;
+				uint float4_index = 0;
 				uint int4_index = 0;
 
 				for (var i = 0; i < symbols.Length; i++) {
@@ -102,33 +99,9 @@ namespace TwoMGFX
 						break;
 
 					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
-                    {
-                        // If we have a precision override for this uniform name, we put it in another bucket
-                        string precisionTag = null;
-                        precisionDict.TryGetValue(symbols[i].name, out precisionTag);
-                        if (precisionTag == "lowp")
-                        {
-                            symbols[i].register_index = lowp_float4_index;
-                            lowp_float4_index += symbols[i].register_count;
-                        }
-                        else if (precisionTag == "mediump")
-                        {
-                            symbols[i].register_index = mediump_float4_index;
-                            mediump_float4_index += symbols[i].register_count;
-                        }
-                        else if (precisionTag == "highp")
-                        {
-                            symbols[i].register_index = highp_float4_index;
-                            highp_float4_index += symbols[i].register_count;
-                        }
-                        else
-                        {
-                            symbols[i].register_index = float4_index;
-                            float4_index += symbols[i].register_count;
-                        }
-                        break;
-
-                    }
+						symbols [i].register_index = float4_index;
+						float4_index += symbols[i].register_count;
+						break;
 
 					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
 						symbols [i].register_index = int4_index;
@@ -181,9 +154,6 @@ namespace TwoMGFX
 			var symbol_types = new [] { 
 				new { name = dxshader.IsVertexShader ? "vs_uniforms_bool" : "ps_uniforms_bool", set = MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL, },
 				new { name = dxshader.IsVertexShader ? "vs_uniforms_ivec4" : "ps_uniforms_ivec4", set = MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4, },
-				new { name = dxshader.IsVertexShader ? "vs_uniforms_lowp_vec4" : "ps_uniforms_lowp_vec4", set = MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4, },
-				new { name = dxshader.IsVertexShader ? "vs_uniforms_mediump_vec4" : "ps_uniforms_mediump_vec4", set = MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4, },
-				new { name = dxshader.IsVertexShader ? "vs_uniforms_highp_vec4" : "ps_uniforms_highp_vec4", set = MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4, },
 				new { name = dxshader.IsVertexShader ? "vs_uniforms_vec4" : "ps_uniforms_vec4", set = MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4, },
 			};
 

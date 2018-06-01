@@ -50,7 +50,7 @@ namespace MonoGameContentProcessors.Processors
             var shaderErrorsAndWarnings = string.Empty;
             try
             {
-                effect = EffectObject.CompileEffect(shaderInfo, out shaderErrorsAndWarnings, null);
+                effect = EffectObject.CompileEffect(shaderInfo, out shaderErrorsAndWarnings);
             }
             catch (ShaderCompilerException)
             {
